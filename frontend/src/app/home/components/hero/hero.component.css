@@ -1,0 +1,13 @@
+/* hero.component.css */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  background: linear-gradient(to right, #e8f0ff, #fff);
+  padding: 40px;
+}
+.hero-content {
+  max-width: 50%;
+}
+.hero-image img {
+  max-height: 250px;
+}
