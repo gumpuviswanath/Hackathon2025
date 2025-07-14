@@ -22,27 +22,63 @@
 
 //     public LoanAssessResponse assessLoan(LoanAssessRequest req) {
 
-//         int score = calculateScore(req.getUserId());
+//         int score = calculateScore(req.userId());
 
-//         BigDecimal eligible = BigDecimal.valueOf(score * 100);
-//         BigDecimal rate = score > 750 
-//             ? BigDecimal.valueOf(10.5) 
-//             : BigDecimal.valueOf(15.0);
-        
-//         String freq = score > 650 ? "weekly" : "daily";
+//         // Determine eligible amount
+//         BigDecimal eligible = req.requestAmount()
+//             .min(BigDecimal.valueOf(score).multiply(BigDecimal.valueOf(100)));
+
+//         // Pick interest rate tier
+//         BigDecimal rate;
+//         if (score >= 750)       rate = BigDecimal.valueOf(10.5);
+//         else if (score >= 700)  rate = BigDecimal.valueOf(12.5);
+//         else if (score >= 650)  rate = BigDecimal.valueOf(15.0);
+//         else if (score >= 600)  rate = BigDecimal.valueOf(18.0);
+//         else                    rate = BigDecimal.ZERO;  // not eligible
+
+//         // Offer frequency options
+//         String freq;
+//         if (score < 600)            freq = "Not Eligible";
+//         else if (score < 650)       freq = "weekly (restricted)";
+//         else if (score < 700)       freq = "weekly";
+//         else                        freq = "daily,weekly";
 
 //         return new LoanAssessResponse(score, eligible, rate, freq);
 //     }
 
 //     private int calculateScore(Long userId) {
         
-//         List<Transaction> transactions = transactionRepository.findByUserId(userId);
-//         int score = 600;
-//         for (Transaction transaction : transactions) {
-//             String label = openAIClient.classify(transaction.getDescription());
-//             score += transaction.getAmount().intValue() / 100;
+//         List<Transaction> txns = transactionRepository.findByUserId(userId);
+//         int base = 600;
+
+//         for (Transaction txn : txns) {
+
+//             String label = openAIClient.classify();
+
+//             switch (label) {
+//                 case "high_risk":
+//                     base -= 50;
+//                     break;
+            
+//                 default:
+//                     break;
+//             }
+//             base += transaction.getAmount().compareTo(BigDecimal.ZERO) > 0 ? 10 : -5;
 //         }
 
-//         return Math.min(score, 900);
+    
+
+//         // Example scoring logic based on transaction history
+//         int score = 0;
+//         for (Transaction transaction : transactions) {
+//             if (transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+//                 score += 10; // Positive transactions increase score
+//             } else {
+//                 score -= 5; // Negative transactions decrease score
+//             }
+//         }
+
+//         // Use OpenAI to refine the score based on additional data
+//         return openAIClient.refineScore(score);
 //     }
 // }
